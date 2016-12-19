@@ -13,6 +13,13 @@
             float: left;
             border: 1px #000 solid;
         }
+        .Error{
+            color: red;
+        }
+        .wisper{
+            color: gray;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -63,7 +70,7 @@
 
                     socket.on('usernames',function (data) {
                        var html='';
-                        for (i=0;i<data.length;i++){
+                        for (var i=0;i<data.length;i++){
                             html += data[i] + '<br/>'
 
                         }
@@ -72,12 +79,30 @@
 
                     $messageForm.submit(function (e) {
                         e.preventDefault();
-                        socket.emit("send message", $messageBox.val());
+                        socket.emit("send message", $messageBox.val(),function (data) {
+                            $chat.append('<span class="Error"> ' + data + "</span><br/>");
+                        });
                         $messageBox.val(' ');
                     });
-                    socket.on('new message', function (data) {
-                       $chat.append('<b>' + data.nick + ':</b>' + data.msg + "<br/>");
+
+                    socket.on("load old messages",function (docs) {
+                        for (var i=docs.length-1; i>=0;i--){
+                            displayMsg(docs[i]);
+                        }
                     });
+
+
+                    socket.on('new message', function (data) {
+                            displayMsg(data);
+                    });
+                    
+                    function displayMsg(data) {
+                        $chat.append('<span class="msg"><b>' + data.nick + ':</b>' + data.msg + "</span> <br/>");
+                    }
+                    
+                    socket.on('wisper',function (data) {
+                        $chat.append('<span class="wisper"> <b>' + data.nick + ':</b>' + data.msg + "</span><br/>");
+                    })
                 });
         </script>
 </body>
