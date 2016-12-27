@@ -9,7 +9,7 @@ var express=require("express"),
     users={ };
 
 server.listen(3000);
-   mongoose.connect('mongodb://localhost/chat',function (error) {
+   mongoose.connect('mongodb://localhost/chatt',function (error) {
       if(error){
          console.log(error);
       }else {
@@ -34,10 +34,13 @@ app.get('/',function (req,res) {
 io.sockets.on('connection',function (socket) {
 
    var query=chat.find({});
-   query.sort('-Created').limit(8).exec(function (error,docs) {
+   //query.sort('-Created').limit(8).exec(function (error,docs) {
+   query.sort('Created').exec(function (error,docs) {
    //query.limit(10).exec(function (error,docs) {
       if(error) throw  error;
       console.log("sending old messages");
+      console.log(docs[10]);
+      console.log(docs.length);
       socket.emit('load old messages',docs);
    });
 
